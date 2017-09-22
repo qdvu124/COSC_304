@@ -16,7 +16,7 @@ add x (S y) = S (add x y)
 
 minus Z x = Z
 minus x Z = x
-minus (S x) (S y) = S  (minus x y) 
+minus (S x) (S y) = minus x y 
 
 mult x Z = Z
 mult Z x = Z
@@ -38,12 +38,44 @@ lte x y = (lt x y) || (x == y)
 
 factNat Z = S Z
 factNat (S x) = mult (S x) (factNat x)
+test1 = nattoInt(factNat(buildNat 5))
+
+addA [] = ["a"]
+addA (x:s) = (x++"a"):(addA s)
+
+astar = "": addA astar
+test2 = take 6 astar
 
 natThree = buildNat 3
 natFive = buildNat 5
 natTwo = buildNat 2
 
 {--
-
-
+Test results:
+listsum [3,4,5,6]
+18
+minus natThree natFive
+Z
+minus natFive natThree
+S (S (S Z))
+add natFive natTwo
+S (S (S (S (S (S (S Z))))))
+mult natTwo natThree
+S (S (S (S (S (S Z)))))
+nattoInt natFive 
+5
+lt natTwo natFive
+True
+lt natFive natTwo
+False
+lt natFive natFive
+False
+lte natFive natFive
+True
+factNat natThree
+S (S (S (S (S (S Z)))))
+test1
+120
+test2
+["","a","aa","aaa","aaaa","aaaaa"]
 --}
