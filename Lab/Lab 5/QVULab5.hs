@@ -1,0 +1,73 @@
+-- Quan Vu
+-- COSC 304 Lab C
+
+module QVULab5 where
+monext f bin e [] = e
+monext f bin e (x:tail) = bin (f x, monext f bin e tail)
+
+ndspec1 'a' 0 = [1, 2]
+ndspec1 'b' 0 = [0]
+ndspec1 'a' 1 = [2, 3]
+ndspec1 'b' 1 = [1]
+ndspec1 'a' 2 = [0, 3]
+ndspec1 'b' 2 = [2]
+ndspec1 'a' 3 = [0, 1]
+ndspec1 'b' 3 = [3]
+
+inlist a [] = False
+inlist a (x:list) = (a == x) || inlist a list
+
+fixlist [] = []
+fixlist (x:list) = if (inlist x list) then fixlist (list) else (x:fixlist(list))
+
+flatten [] = []
+flatten (list:listoflists) = list ++ (flatten listoflists)
+
+relcomp(f, g) a = fixlist (flatten (map g (f a)))
+relidentity x = [x]
+
+nfa ndspec = monext ndspec relcomp relidentity
+
+nfa1 = nfa ndspec1
+
+test1 = nfa1 "abbababbaba" 1
+startndm ndspec string = nfa ndspec string 0
+test2 = startndm ndspec1 "abbababbaba"
+
+addtolist x list = if (inlist x list) then list else x : list
+
+inter [] list2 = []
+inter (x:list1) list2 = if (inlist x list2) then x : (inter list1 list2) else inter list1 list2
+
+ndfa (ndspec, finalstates) string = length (inter (startndm ndspec string) finalstates) /= 0
+test3 = ndfa (ndspec1,[0,2]) "abbababbabaaaa"
+test4 = ndfa (ndspec1,[0]) "ab"
+
+ndspec2 'a' 0 = [1, 2]
+ndspec2 'b' 0 = [3]
+ndspec2 'a' 1 = [1]
+ndspec2 'b' 1 = [2]
+ndspec2 'a' 2 = [3]
+ndspec2 'b' 2 = [2]
+ndspec2 'a' 3 = [3]
+ndspec2 'b' 3 = [3]
+
+test5 = ndfa(ndspec2,[2]) "a"
+test6 = ndfa(ndspec2,[2]) "abab"
+
+nndspec3 "a" 0 = [1]
+nndspec3 "b" 0 = [0]
+nndspec3 "a" 1 = [1]
+nndspec3 "b" 1 = [2]
+nndspec3 "a" 2 = [3]
+nndspec3 "b" 2 = [2]
+nndspec3 "" 2 = [1]
+nndspec3 "a" 3 = [3]
+nndspec3 "b" 3 = [3]
+
+nnfa ndspec = monext ndspec relcomp relidentity
+nstartndm nndspec string = nnfa nndspec string 0
+nndfa (nndspec, finalstates) string = length (inter (nstartndm nndspec string) finalstates) /= 0
+
+test7 = nstartndm nndspec3 ["a","b","","a"] == nstartndm nndspec3 ["a","b","a"]
+test8 = nndfa (nndspec3,[2]) ["a","b","","a","b"] == nndfa (nndspec3,[2]) ["a","b","a","b"]
