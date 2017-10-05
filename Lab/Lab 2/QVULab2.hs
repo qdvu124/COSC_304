@@ -50,6 +50,9 @@ natThree = buildNat 3
 natFive = buildNat 5
 natTwo = buildNat 2
 
+test1 = nattoInt(factNat(buildNat 5))
+test2 = take 6 astar 
+
 {--
 Test results:
 listsum [3,4,5,6]
