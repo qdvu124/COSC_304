@@ -12,3 +12,8 @@ inlist val (x:list) = (val == x) || inlist val list
 first (a,b) = a
 second (a,b) = b
 
+spec1 'a' (0, stack) = (0, "a"++stack)
+spec1 'b' (0, stack) = (0, "b"++stack)
+spec1 'c' (0, stack) = (1, stack)
+spec1 'a' (1, 'a':stack) = (1, stack);
+spec1 'b' (1, 'b':stack) = (1, stack);
