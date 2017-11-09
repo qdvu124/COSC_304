@@ -43,7 +43,11 @@ spec2 'a' (1, 'b':stack) = (1, stack)
 spec2 'b' (1, 'c':stack) = (1, "bc"++stack)
 spec2 'b' (1, 'b':stack) = (1, "bb"++stack)
 spec2 'b' (1, 'a':stack) = (1, stack)
-spec2 'z' (1, 'c':stack) = (2, "");
+spec2 'z' (1, 'c':stack) = (2, "")
+
+-- Extra rules to take care of the case when z is encountered and top of stack is not c
+spec2 'z' (1, 'a':stack) = (2, 'a':stack)
+spec2 'z' (1, 'b':stack) = (2, 'b':stack)
 
 final2 = [(2, "")]
 pdaspec2 = (spec2, final2)
