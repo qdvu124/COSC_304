@@ -1,0 +1,112 @@
+-- Quan Vu COS304, Lab C
+
+module QVULab9 where
+-- For machine 1
+spec1 (0, '#') = (0, '#', 'l')
+spec1 (0, 'a') = (1, 'a', 'l')
+spec1 (0, 'b') = (1, 'a', 'l')
+spec1 (0, 'c') = (1, 'a', 'l')
+spec1 (0, 'd') = (1, 'a', 'l')
+
+spec1 (1, '#') = (2, '#', 'r')
+spec1 (1, 'a') = (1, 'a', 'l')
+spec1 (1, 'b') = (1, 'a', 'l')
+spec1 (1, 'c') = (1, 'a', 'l')
+spec1 (1, 'd') = (1, 'a', 'l')
+
+spec1 (2, '#') = (100, '#', 'd')
+spec1 (2, 'a') = (2, 'a', 'r')
+spec1 (2, 'b') = (2, 'b', 'r')
+spec1 (2, 'c') = (2, 'c', 'r')
+spec1 (2, 'd') = (2, 'd', 'r')
+-- For machine 2
+spec2 (0, '#') = (1, '#', 'l')
+spec2 (0, 'a') = (0, 'a', 'l')
+spec2 (0, 'b') = (0, 'b', 'l')
+spec2 (0, 'c') = (0, 'c', 'l')
+spec2 (0, 'd') = (0, 'd', 'l')
+
+spec2 (1, '#') = (2, '#', 'r')
+spec2 (1, 'b') = (1, 'c', 'l')
+spec2 (1, 'a') = (1, 'b', 'l')
+spec2 (1, 'c') = (1, 'b', 'l')
+spec2 (1, 'd') = (1, 'b', 'l')
+
+spec2 (2, '#') = (100, '#', 'd')
+spec2 (2, 'a') = (2, 'a', 'r')
+spec2 (2, 'b') = (2, 'b', 'r')
+spec2 (2, 'c') = (2, 'c', 'r')
+spec2 (2, 'd') = (2, 'd', 'r')
+-- For machine 3
+spec3 (0, '#') = (1, '#', 'l')
+spec3 (0, 'a') = (0, 'a', 'l')
+spec3 (0, 'b') = (0, 'b', 'l')
+spec3 (0, 'c') = (0, 'c', 'l')
+spec3 (0, 'd') = (0, 'd', 'l')
+
+spec3 (1, '#') = (2, '#', 'r')
+spec3 (1, 'b') = (2, 'a', 'l')
+spec3 (1, 'a') = (1, 'd', 'l')
+spec3 (1, 'c') = (1, 'd', 'l')
+spec3 (1, 'd') = (1, 'd', 'l')
+
+spec3 (2, '#') = (100, '#', 'd')
+spec3 (2, 'a') = (2, 'a', 'r')
+spec3 (2, 'b') = (2, 'b', 'r')
+spec3 (2, 'c') = (2, 'c', 'r')
+spec3 (2, 'd') = (2, 'd', 'r')
+-- For machine 4
+spec4 (0, '#') = (100, 'a', 'r')
+spec4 (0, 'a') = (100, 'a', 'r')
+spec4 (0, 'b') = (100, 'b', 'r')
+spec4 (0, 'c') = (100, 'c', 'r')
+spec4 (0, 'd') = (100, 'd', 'r')
+
+val (head:str, 0) = head
+val (head:str, pos) = val (str, pos - 1)
+
+startstring str = "#"++str++"#"
+
+startpos "" = 1
+startpos (head:str) = 1 + (startpos str)
+
+len "" = 0
+len (head:str) = 1 + len str
+
+chstr(head:str, ch, 0) = ch:str
+chstr(head:str, ch, pos) = head:chstr(str, ch, pos - 1)
+
+move (str, state, ch, pos) = let (newstate, newchar, newdir) = spec1(state, ch) in if newdir == 'l' then (chstr(str, newchar, pos), newstate, val(str, pos - 1), pos - 1) else if newdir == 'r' then (chstr(str, newchar, pos), newstate, val (str, pos + 1), pos + 1) else (chstr(str, newchar, pos), newstate, newchar, pos)
+
+run (str, 100, ch, pos) = (str, 100, ch, pos)
+run (str, state, ch, pos) = run (move(str, state, ch, pos))
+
+startrun str = run(startstring str, 0, val(startstring str, startpos str),startpos str)
+
+-- Lab 9 work
+newmove tmspec (str, state, ch, pos) = let (newstate, newchar, newdir) = tmspec (state, ch) in if newdir == 'l' then (chstr(str, newchar, pos), newstate, val(str, pos - 1), pos - 1) else if newdir == 'r' then (chstr(str, newchar, pos), newstate, val (str, pos + 1), pos + 1) else (chstr(str, newchar, pos), newstate, newchar, pos)
+
+newrun tmspec (str, 100, ch, pos) = (str, 100, ch, pos)
+newrun tmspec (str, state, ch, pos) = newrun tmspec (newmove tmspec (str, state, ch, pos))
+
+newstartrun tmspec str = newrun tmspec (startstring str, 0, val(startstring str, startpos str), startpos str)
+
+str1 = "abcd"
+test1 = newstartrun spec1 str1
+
+test2 = newstartrun spec2 str1
+test3 = newstartrun spec3 "ccad"
+
+-- newstartrun spec4 "aaa" causes non-exhaustive pattern in function val, since we are moving outside of the right most character of the input string
+
+newmove2 tmspec (str, state, ch, pos) = let (newstate, newchar, newdir) = tmspec (state, ch) in if newdir == 'l' then (chstr(str, newchar, pos), newstate, val(str, pos - 1), pos - 1) else if newdir == 'r' then if pos == len (str) - 1 then (chstr(str++"#", newchar, pos), newstate, val (str++"#", pos + 1), pos + 1) else (chstr(str, newchar, pos), newstate, val (str, pos + 1), pos + 1) else (chstr(str, newchar, pos), newstate, newchar, pos)
+
+newrun2 tmspec (str, 100, ch, pos) = (str, 100, ch, pos)
+newrun2 tmspec (str, state, ch, pos) = newrun tmspec (newmove2 tmspec (str, state, ch, pos))
+
+newstartrun2 tmspec str = newrun2 tmspec (startstring str, 0, val(startstring str, startpos str), startpos str)
+test4 = newstartrun2 spec4 "aaa"
+test5 = newstartrun2 spec4 str1
+
+
+
